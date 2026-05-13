@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>España — Presentación Interactiva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #C41E3A;
+    --gold: #D4A017;
+    --cream: #FAF6EE;
+    --dark: #1A0A0A;
+    --text: #2C1810;
+    --muted: #8B6F5E;
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--dark);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(196,30,58,0.06) 40px,
+      rgba(196,30,58,0.06) 41px
+    );
+  }
+
+  .flag-stripe {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--red) 33%, var(--gold) 33%, var(--gold) 66%, var(--red) 66%);
+  }
+
+  .flag-stripe-bottom {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--red) 33%, var(--gold) 33%, var(--gold) 66%, var(--red) 66%);
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    color: var(--cream);
+    letter-spacing: -2px;
+    line-height: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  header h1 span {
+    color: var(--gold);
+  }
+
+  header p {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1.2rem;
+    margin-top: 8px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* TOPICS GRID */
+  .topics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 40px 24px 24px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .topic-btn {
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    padding: 16px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+
+  .topic-btn::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--red);
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .topic-btn:hover {
+    border-color: var(--red);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(196,30,58,0.15);
+  }
+
+  .topic-btn:hover::before { transform: scaleX(1); }
+
+  .topic-btn.active {
+    background: var(--red);
+    color: white;
+    border-color: var(--red);
+  }
+
+  .topic-btn.active::before { background: var(--gold); transform: scaleX(1); }
+
+  .topic-icon { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+
+  /* CONTENT AREA */
+  .content-area {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  .prompt-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .custom-input {
+    flex: 1;
+    background: white;
+    border: 2px solid #E8DDD5;
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.1rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .custom-input:focus { border-color: var(--red); }
+
+  .generate-btn {
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 14px 28px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 1px;
+  }
+
+  .generate-btn:hover { background: #A01528; transform: translateY(-1px); }
+  .generate-btn:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+
+  /* OUTPUT */
+  .output-card {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .output-card.visible { display: block; }
+
+  .output-header {
+    background: var(--dark);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .output-title {
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .output-badge {
+    background: var(--gold);
+    color: var(--dark);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .output-body {
+    padding: 32px 36px;
+    font-size: 1.15rem;
+    line-height: 1.9;
+    color: var(--text);
+  }
+
+  .output-body h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--red);
+    margin-bottom: 16px;
+    margin-top: 28px;
+    border-bottom: 1px solid #E8DDD5;
+    padding-bottom: 8px;
+  }
+
+  .output-body h2:first-child { margin-top: 0; }
+
+  .output-body p { margin-bottom: 14px; }
+
+  .output-body ul {
+    margin: 12px 0 16px 24px;
+  }
+
+  .output-body li { margin-bottom: 6px; }
+
+  .output-body strong { color: var(--red); font-weight: 700; }
+
+  /* LOADING */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 48px;
+  }
+
+  .loading.visible { display: block; }
+
+  .flamenco-loader {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border: 3px solid #E8DDD5;
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading p {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+
+  /* DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0 24px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #E8DDD5;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.9rem;
+    border-top: 1px solid #E8DDD5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="flag-stripe"></div>
+  <h1>Es<span>p</span>aña</h1>
+  <p>Presentación Interactiva con IA</p>
+  <div class="flag-stripe-bottom"></div>
+</header>
+
+<div class="topics">
+  <button class="topic-btn" onclick="selectTopic(this, 'la cultura española y el flamenco')">
+    <span class="topic-icon">💃</span>Cultura & Flamenco
+  </button>
+  <button class="topic-btn" onclick="selectTopic(this, 'las fiestas populares españolas como La Tomatina y San Fermín')">
+    <span class="topic-icon">🍅</span>Fiestas Populares
+  </button>
+  <button class="topic-btn" onclick="selectTopic(this, 'la gastronomía española: paella, tapas, jamón ibérico, tortilla española')">
+    <span class="topic-icon">🥘</span>Gastronomía
+  </button>
+  <button class="topic-btn" onclick="selectTopic(this, 'los lugares turísticos más famosos de España: La Sagrada Familia, Alhambra, Museo del Prado')">
+    <span class="topic-icon">🏛️</span>Turismo
+  </button>
+  <button class="topic-btn" onclick="selectTopic(this, 'el deporte en España: fútbol, Real Madrid, FC Barcelona y Rafael Nadal')">
+    <span class="topic-icon">⚽</span>Deporte
+  </button>
+  <button class="topic-btn" onclick="selectTopic(this, 'la historia de España: los Reyes Católicos, la Edad Media y el descubrimiento de América')">
+    <span class="topic-icon">👑</span>Historia
+  </button>
+  <button class="topic-btn" onclick="selectTopic(this, 'las ciudades más importantes de España: Madrid, Barcelona, Sevilla y Valencia')">
+    <span class="topic-icon">🌆</span>Ciudades
+  </button>
+  <button class="topic-btn" onclick="selectTopic(this, 'la música y el arte español: flamenco, Pablo Picasso y Salvador Dalí')">
+    <span class="topic-icon">🎨</span>Arte & Música
+  </button>
+  <button class="topic-btn" onclick="selectTopic(this, 'las costumbres y la vida diaria en España: horarios, la siesta y la familia')">
+    <span class="topic-icon">☀️</span>Vida Cotidiana
+  </button>
+</div>
+
+<div class="content-area">
+  <div class="divider">o escribe tu pregunta</div>
+
+  <div class="prompt-row">
+    <input 
+      class="custom-input" 
+      id="customInput" 
+      type="text" 
+      placeholder="Ej: ¿Qué es el flamenco? ¿Cuándo se celebra La Tomatina?"
+      onkeydown="if(event.key==='Enter') generate()"
+    />
+    <button class="generate-btn" id="genBtn" onclick="generate()">Generar ✦</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="flamenco-loader"></div>
+    <p>Preparando tu contenido sobre España...</p>
+  </div>
+
+  <div class="output-card" id="outputCard">
+    <div class="output-header">
+      <span class="output-title" id="outputTitle">—</span>
+      <span class="output-badge">IA · España</span>
+    </div>
+    <div class="output-body" id="outputBody"></div>
+  </div>
+</div>
+
+<footer>Generado con Inteligencia Artificial — ¡Viva España! 🇪🇸</footer>
+
+<script>
+let currentTopic = '';
+
+function selectTopic(btn, topic) {
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTopic = topic;
+  document.getElementById('customInput').value = '';
+  generate(topic);
+}
+
+function generate(forcedTopic) {
+  const input = document.getElementById('customInput');
+  const topic = forcedTopic || input.value.trim() || currentTopic;
+  if (!topic) return;
+
+  const btn = document.getElementById('genBtn');
+  const loading = document.getElementById('loading');
+  const card = document.getElementById('outputCard');
+  const body = document.getElementById('outputBody');
+  const title = document.getElementById('outputTitle');
+
+  btn.disabled = true;
+  loading.classList.add('visible');
+  card.classList.remove('visible');
+  body.innerHTML = '';
+
+  const prompt = `Eres un experto en cultura española. Escribe un texto educativo, interesante y bien estructurado sobre: "${topic}".
+
+El texto debe estar en español y tener:
+- Un título principal con ##
+- 2-3 secciones con subtítulos con ##
+- Párrafos informativos con datos curiosos e interesantes
+- Bullet points cuando sea útil con -
+- Palabras clave en **negrita**
+
+Sé educativo, apasionado y usa un tono que inspire interés por España. Máximo 350 palabras.`;
+
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      messages: [{ role: "user", content: prompt }]
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    const text = data.content?.[0]?.text || "Error al generar el contenido.";
+    title.textContent = topic.charAt(0).toUpperCase() + topic.slice(1);
+    body.innerHTML = renderMarkdown(text);
+    loading.classList.remove('visible');
+    card.classList.add('visible');
+    btn.disabled = false;
+  })
+  .catch(() => {
+    loading.classList.remove('visible');
+    body.innerHTML = '<p style="color:var(--red)">Error de conexión. Inténtalo de nuevo.</p>';
+    card.classList.add('visible');
+    btn.disabled = false;
+  });
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[hul])(.+)$/gm, (m) => m.startsWith('<') ? m : `<p>${m}</p>`)
+    .replace(/<p><\/p>/g, '')
+    .replace(/<p>(<h\d>)/g, '$1')
+    .replace(/(<\/h\d>)<\/p>/g, '$1');
+}
+</script>
+</body>
+</html>
